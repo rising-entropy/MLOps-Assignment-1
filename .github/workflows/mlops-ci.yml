@@ -1,0 +1,107 @@
+name: MLOps CI (pre-merge)
+
+# Pre-merge gate: lint -> unit tests -> retrain + model quality gate.
+# Runs on every pull request into main, and can be started by hand.
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# a new push to the same PR cancels the older run
+concurrency:
+  group: mlops-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.10"
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  lint:
+    name: Lint (flake8)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Install flake8
+        run: pip install flake8==7.4.1
+      - name: Run flake8
+        run: |
+          set -o pipefail
+          flake8 src tests | tee flake8.log
+      - name: Upload lint log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-log
+          path: flake8.log
+          if-no-files-found: ignore
+
+  test:
+    name: Unit tests (pytest)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run unit tests
+        run: pytest --junitxml=reports/pytest-junit.xml
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: reports/pytest-junit.xml
+          if-no-files-found: ignore
+
+  train:
+    name: Train model + quality gate
+    runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Train (tune, nested CV, MLflow tracking, package)
+        run: |
+          set -o pipefail
+          python -m src.train 2>&1 | tee train.log
+      - name: Quality gate on the freshly trained model
+        run: pytest tests/test_trained_model.py -v
+      - name: Summarise metrics
+        if: success()
+        run: |
+          {
+            echo "### Trained model"
+            python -c "import json; m=json.load(open('models/model_metadata.json')); print('- model:', m['model']); print('- nested-CV ROC-AUC:', m['cv_metrics']['roc_auc']); print('- test metrics:', m['test_metrics'])"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload training artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-artifacts
+          path: |
+            train.log
+            models/
+            mlflow.db
+            mlartifacts/
+          if-no-files-found: ignore

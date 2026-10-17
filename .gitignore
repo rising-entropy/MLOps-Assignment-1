@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+# local MLflow store (regenerate with `python -m src.train`)
+mlflow.db
+mlartifacts/
+mlruns/
+train.log
+flake8.log
+reports/pytest-junit.xml
+.pytest_cache/
