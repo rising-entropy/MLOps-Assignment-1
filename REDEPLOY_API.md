@@ -5,10 +5,10 @@ The VPS runs a small HTTP API (in the `vps-infra` repo, `post-merge-api/`) that 
 ## Endpoint
 
 ```
-POST http://<vps-host>:7206/post-merge
+POST http://<vps-host>:3003/post-merge
 ```
 
-Port `7206` is the host port that maps to the API container. Put it behind Nginx Proxy Manager with HTTPS if it is reachable from the internet.
+Port `3003` is the host port that maps to the API container. Put it behind Nginx Proxy Manager with HTTPS if it is reachable from the internet.
 
 ### Authentication
 
@@ -17,7 +17,7 @@ HTTP Basic auth. The username and password are in `post-merge-api/.env` in the `
 ### Request
 
 ```bash
-curl -X POST http://<vps-host>:7206/post-merge \
+curl -X POST http://<vps-host>:3003/post-merge \
   -u "<API_USERNAME>:<API_PASSWORD>" \
   -H "Content-Type: application/json" \
   -d '{"action": "MLOps-Redeploy-All"}'
