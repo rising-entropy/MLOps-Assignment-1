@@ -7,7 +7,7 @@ from pathlib import Path
 
 import joblib
 import pandas as pd
-# Flask serves the prediction endpoints; Prometheus metrics are exposed alongside them.
+# Flask serves the prediction endpoints; Prometheus metrics are exposed on the same port.
 from flask import Flask, Response, g, jsonify, request
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
