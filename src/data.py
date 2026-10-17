@@ -2,7 +2,7 @@
 import pandas as pd
 import requests
 
-from src import config
+from src import config  # single source of truth for paths and columns
 
 
 def download(force=False):

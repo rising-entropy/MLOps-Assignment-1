@@ -25,8 +25,8 @@ LABELS = {0: "No disease", 1: "Disease"}
 NUMERIC = ["age", "trestbps", "chol", "thalach", "oldpeak"]
 CATEGORICAL = ["cp", "restecg", "slope", "thal"]   # nominal -> one-hot
 BINARY_ORDINAL = ["sex", "fbs", "exang", "ca"]     # already 0/1 or 0-3 counts
-ENGINEERED = ["hr_pct_max", "oldpeak_x_exang"]
+ENGINEERED = ["hr_pct_max", "oldpeak_x_exang"]  # derived in FeatureEngineer, not in raw data
 FEATURES = NUMERIC + CATEGORICAL + BINARY_ORDINAL
 
-SEED = 42
+SEED = 42  # fixed for reproducible splits and CV folds
 TEST_SIZE = 0.20
