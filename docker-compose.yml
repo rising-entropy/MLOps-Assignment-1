@@ -7,7 +7,7 @@ services:
       dockerfile: api/Dockerfile
     image: heart-api:latest
     ports:
-      - "8000:8000"
+      - "7201:8000"
     restart: unless-stopped
 
   ui:
@@ -18,7 +18,7 @@ services:
     environment:
       API_URL: http://api:8000
     ports:
-      - "8501:8501"
+      - "7202:8501"
     depends_on:
       - api
     restart: unless-stopped
@@ -30,7 +30,7 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     ports:
-      - "9090:9090"
+      - "7203:9090"
     depends_on:
       - api
     restart: unless-stopped
@@ -42,7 +42,7 @@ services:
       - ./monitoring/loki-config.yml:/etc/loki/config.yml:ro
       - loki-data:/loki
     ports:
-      - "3100:3100"
+      - "7204:3100"
     restart: unless-stopped
 
   promtail:
@@ -68,7 +68,7 @@ services:
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
     ports:
-      - "3000:3000"
+      - "7205:3000"
     depends_on:
       - prometheus
       - loki

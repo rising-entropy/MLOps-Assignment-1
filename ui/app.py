@@ -4,7 +4,7 @@ import os
 import requests
 import streamlit as st
 
-API_URL = os.environ.get("API_URL", "http://localhost:8000")
+API_URL = os.environ.get("API_URL", "http://localhost:7201")
 
 st.set_page_config(page_title="Heart Disease Risk", page_icon="❤️")
 st.title("Heart Disease Risk Predictor")
