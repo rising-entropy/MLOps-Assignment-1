@@ -53,7 +53,7 @@
     "f1": 0.8525,
     "roc_auc": 0.9513
   },
-  "mlflow_run_id": "cc599781644b4d91a19776645d4af5fe",
+  "mlflow_run_id": "35dff0c50e9d4835b0850c0e2f467793",
   "versions": {
     "python": "3.10.11",
     "sklearn": "1.7.2"
